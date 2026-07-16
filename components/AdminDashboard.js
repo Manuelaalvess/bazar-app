@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { upload } from '@vercel/blob/client';
 
 function formatBRL(value) {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -28,6 +29,8 @@ export default function AdminDashboard() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     loadAll();
@@ -83,6 +86,27 @@ export default function AdminDashboard() {
   function resetForm() {
     setEditingId(null);
     setForm(EMPTY_FORM);
+  }
+
+  async function handleFileUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      // Upload direto do navegador pro Vercel Blob (não passa pelo servidor
+      // Next.js), então funciona mesmo com fotos grandes de celular.
+      const blob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/admin/upload',
+      });
+      setForm((f) => ({ ...f, imageUrl: blob.url }));
+      setActionError('');
+    } catch (err) {
+      setActionError('Não foi possível enviar a foto. Tente novamente.');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   }
 
   async function handleSaveItem(e) {
@@ -238,8 +262,32 @@ export default function AdminDashboard() {
               <input value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} placeholder="60" inputMode="decimal" />
             </div>
             <div className="form-field full">
-              <label>URL da foto (opcional)</label>
-              <input value={form.imageUrl} onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))} placeholder="https://..." />
+              <label>Foto (opcional)</label>
+              <input value={form.imageUrl} onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))} placeholder="Cole o link da foto…" />
+              <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button
+                  type="button"
+                  className="mini-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? 'enviando…' : 'ou enviar da galeria'}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                />
+                {form.imageUrl && (
+                  <img
+                    src={form.imageUrl}
+                    alt="Pré-visualização"
+                    style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--line)' }}
+                  />
+                )}
+              </div>
             </div>
             <div className="form-field full">
               <label>Descrição curta (opcional)</label>
