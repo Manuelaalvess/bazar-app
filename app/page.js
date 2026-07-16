@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-const WHATSAPP_NUMBER = '5500000000000';
+// Configurada na Vercel (ou no .env local) — sem ela, a reserva ainda
+// funciona, só não gera o link pronto do WhatsApp.
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '';
 const CATEGORIES = [
   { key: 'all', label: 'todas' },
   { key: 'vestido', label: 'vestidos' },
@@ -34,6 +36,7 @@ export default function CatalogPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     fetchItems();
@@ -41,10 +44,17 @@ export default function CatalogPage() {
 
   async function fetchItems() {
     setLoading(true);
-    const res = await fetch('/api/items');
-    const data = await res.json();
-    setItems(data.items || []);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/items');
+      if (!res.ok) throw new Error('Falha ao carregar catálogo');
+      const data = await res.json();
+      setItems(data.items || []);
+      setLoadError('');
+    } catch (err) {
+      setLoadError('Não foi possível carregar o catálogo. Tente recarregar a página.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   const visibleItems = useMemo(() => {
@@ -97,7 +107,9 @@ export default function CatalogPage() {
         items: cartItems,
         total: cartTotal,
       });
-      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      const waUrl = WHATSAPP_NUMBER
+        ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+        : null;
       setSuccess({ waUrl });
       setCart([]);
       setForm({ customerName: '', phone: '' });
@@ -150,6 +162,8 @@ export default function CatalogPage() {
 
         {loading ? (
           <p className="empty-note">Carregando catálogo…</p>
+        ) : loadError ? (
+          <p className="form-error">{loadError}</p>
         ) : visibleItems.length === 0 ? (
           <p className="empty-note">Nenhuma peça nessa categoria no momento.</p>
         ) : (
@@ -232,9 +246,13 @@ export default function CatalogPage() {
             {success ? (
               <div>
                 <p style={{ marginBottom: 16 }}>Reserva registrada! Finalize com a loja pelo WhatsApp para combinar o Pix e a entrega.</p>
-                <a className="submit-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }} href={success.waUrl} target="_blank" rel="noreferrer">
-                  abrir whatsapp
-                </a>
+                {success.waUrl ? (
+                  <a className="submit-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }} href={success.waUrl} target="_blank" rel="noreferrer">
+                    abrir whatsapp
+                  </a>
+                ) : (
+                  <p className="form-error">Reserva registrada, mas o WhatsApp da loja ainda não foi configurado. Entre em contato por outro meio para combinar o Pix e a entrega.</p>
+                )}
               </div>
             ) : cartItems.length === 0 ? (
               <p className="empty-note">Sua seleção está vazia.</p>

@@ -27,6 +27,7 @@ export default function AdminDashboard() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     loadAll();
@@ -53,11 +54,17 @@ export default function AdminDashboard() {
   }
 
   async function updateOrder(orderId, status) {
-    await fetch(`/api/orders/${orderId}`, {
+    const res = await fetch(`/api/orders/${orderId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || 'Não foi possível atualizar o pedido.');
+      return;
+    }
+    setActionError('');
     loadAll();
   }
 
@@ -90,35 +97,52 @@ export default function AdminDashboard() {
     };
     if (!payload.name || !payload.size || Number.isNaN(payload.price)) return;
 
-    if (editingId) {
-      await fetch(`/api/items/${editingId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    } else {
-      await fetch('/api/items', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+    const res = editingId
+      ? await fetch(`/api/items/${editingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+      : await fetch('/api/items', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || 'Não foi possível salvar a peça.');
+      return;
     }
+    setActionError('');
     resetForm();
     loadAll();
   }
 
   async function handleDeleteItem(id) {
     if (!confirm('Excluir esta peça definitivamente?')) return;
-    await fetch(`/api/items/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/items/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || 'Não foi possível excluir a peça.');
+      return;
+    }
+    setActionError('');
     loadAll();
   }
 
   async function markSold(item) {
-    await fetch(`/api/items/${item.id}`, {
+    const res = await fetch(`/api/items/${item.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: item.status === 'sold' ? 'available' : 'sold' }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || 'Não foi possível atualizar a peça.');
+      return;
+    }
+    setActionError('');
     loadAll();
   }
 
@@ -130,9 +154,11 @@ export default function AdminDashboard() {
       </div>
 
       <div className="admin-tabs">
-        <button className={`admin-tab ${tab === 'orders' ? 'active' : ''}`} onClick={() => setTab('orders')}>pedidos</button>
-        <button className={`admin-tab ${tab === 'items' ? 'active' : ''}`} onClick={() => setTab('items')}>peças</button>
+        <button className={`admin-tab ${tab === 'orders' ? 'active' : ''}`} onClick={() => { setTab('orders'); setActionError(''); }}>pedidos</button>
+        <button className={`admin-tab ${tab === 'items' ? 'active' : ''}`} onClick={() => { setTab('items'); setActionError(''); }}>peças</button>
       </div>
+
+      {actionError && <p className="form-error" style={{ marginBottom: 16 }}>{actionError}</p>}
 
       {loading ? (
         <p className="empty-note">Carregando…</p>

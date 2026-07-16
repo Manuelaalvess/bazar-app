@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
 import { updateOrderStatus } from '../../../../lib/db';
-import { COOKIE_NAME, verifySessionToken } from '../../../../lib/auth';
-import { cookies } from 'next/headers';
-
-function isAdmin() {
-  const token = cookies().get(COOKIE_NAME)?.value;
-  return token ? verifySessionToken(token) : false;
-}
+import { isAdminRequest } from '../../../../lib/auth';
 
 export async function PATCH(request, { params }) {
-  if (!isAdmin()) {
+  if (!isAdminRequest()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
   const { status } = await request.json();

@@ -24,6 +24,14 @@ aplicação, num serviço próprio, então os dados sobrevivem normalmente a
 deploys, reinícios e múltiplas instâncias do servidor rodando ao mesmo tempo.
 É o padrão usado por aplicações profissionais em produção.
 
+## Variáveis de ambiente
+
+| Variável | Obrigatória | Descrição |
+| --- | --- | --- |
+| `DATABASE_URL` | sim | connection string do Postgres |
+| `ADMIN_PASSWORD` | sim | senha do painel admin — sem ela, o app recusa qualquer login (não existe senha padrão) |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | não | número da loja (DDI 55 + DDD, só números) para o link do WhatsApp após a reserva |
+
 ## Como rodar no seu computador
 
 Pré-requisitos: Node.js 22+ e acesso a um banco Postgres (veja abaixo as opções).
@@ -58,7 +66,9 @@ As tabelas são criadas automaticamente na primeira execução — não precisa 
 nenhum comando de migração separado.
 
 Painel da loja: `http://localhost:3000/admin`
-Senha padrão: está em `.env`, na variável `ADMIN_PASSWORD` — **troque antes de usar de verdade.**
+Senha: a que você definiu em `.env`, na variável `ADMIN_PASSWORD`. Sem essa variável configurada,
+o login fica desabilitado (o servidor recusa qualquer tentativa) — não existe senha padrão de fábrica.
+O login também tem limite de 10 tentativas por IP a cada 15 minutos.
 
 ## O que o sistema faz
 
@@ -79,7 +89,9 @@ Senha padrão: está em `.env`, na variável `ADMIN_PASSWORD` — **troque antes
 
 1. Troque `ADMIN_PASSWORD` no `.env` (e nas variáveis de ambiente da Vercel, se for fazer deploy lá) para uma senha só sua.
 2. Apague as peças de exemplo pelo painel e cadastre as suas peças reais (com foto).
-3. No arquivo `app/page.js`, troque `WHATSAPP_NUMBER` pelo seu número (com DDI 55 + DDD, só números).
+3. Defina `NEXT_PUBLIC_WHATSAPP_NUMBER` (com DDI 55 + DDD, só números) no `.env` ou nas
+   variáveis de ambiente da Vercel — sem ela, a reserva funciona normalmente, só não
+   gera o link pronto do WhatsApp.
 
 ## Deploy na Vercel
 
@@ -88,6 +100,7 @@ Senha padrão: está em `.env`, na variável `ADMIN_PASSWORD` — **troque antes
 3. Em **Settings → Environment Variables**, adicione:
    - `DATABASE_URL` — a connection string do Neon/Supabase (com `?sslmode=require`)
    - `ADMIN_PASSWORD` — sua senha do painel
+   - `NEXT_PUBLIC_WHATSAPP_NUMBER` — número da loja para o link do WhatsApp
 4. Deploy. Pronto — o banco na nuvem já está acessível de qualquer lugar, e o
    site funciona igual em produção e em desenvolvimento.
 
@@ -106,8 +119,9 @@ components/
   AdminDashboard.js      lógica do painel (pedidos e gestão de peças)
 lib/
   db.js                  toda a lógica de acesso ao banco (única camada que fala com o Postgres)
-  auth.js                geração/verificação do cookie de sessão do admin
-  schema.sql             schema de referência (o db.js já cria as tabelas sozinho)
+  auth.js                geração/verificação do cookie de sessão do admin (isAdminRequest)
+  validation.js          validação de URL de imagem
+  schema.sql             schema de referência (o db.js já cria as tabelas e constraints sozinho)
 scripts/
   seed.js                popula o catálogo com peças de exemplo
 ```

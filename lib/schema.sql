@@ -31,3 +31,14 @@ CREATE TABLE IF NOT EXISTS order_items (
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_item_id ON order_items(item_id);
 CREATE INDEX IF NOT EXISTS idx_items_status ON items(status);
+
+-- lib/db.js aplica essas constraints via ALTER idempotente na inicialização
+-- (bancos já existentes recebem na próxima subida do app), este arquivo é
+-- só a referência de schema completo.
+ALTER TABLE items DROP CONSTRAINT IF EXISTS items_status_check;
+ALTER TABLE items ADD CONSTRAINT items_status_check
+  CHECK (status IN ('available', 'reserved', 'sold'));
+
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check;
+ALTER TABLE orders ADD CONSTRAINT orders_status_check
+  CHECK (status IN ('pending', 'confirmed', 'delivered', 'cancelled'));
