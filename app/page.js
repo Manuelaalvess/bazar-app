@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 // Configurada na Vercel (ou no .env local) — sem ela, a reserva ainda
 // funciona, só não gera o link pronto do WhatsApp.
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '';
+const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || 'Bazar da Nat';
 const CATEGORIES = [
   { key: 'all', label: 'todas' },
   { key: 'vestido', label: 'vestidos' },
@@ -130,7 +131,7 @@ export default function CatalogPage() {
   return (
     <>
       <header className="site-header wrap">
-        <div className="brand">bazar da nat</div>
+        <div className="brand">{STORE_NAME.toLowerCase()}</div>
         <a className="admin-link" href="/admin">área da loja</a>
       </header>
 
@@ -301,7 +302,7 @@ export default function CatalogPage() {
       )}
 
       <footer className="site-footer">
-        <p>Bazar da Nat · reservas via site, pagamento por Pix, combinado direto no WhatsApp.</p>
+        <p>{STORE_NAME} · reservas via site, pagamento por Pix, combinado direto no WhatsApp.</p>
       </footer>
     </>
   );

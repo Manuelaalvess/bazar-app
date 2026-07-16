@@ -1,7 +1,12 @@
 import './globals.css';
 
+// Permite reaproveitar o mesmo código para lojas diferentes (ex.: vitrine de
+// portfólio vs. loja real) sem duplicar arquivos — cada deploy define seu
+// próprio nome via variável de ambiente.
+const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || 'Bazar da Nat';
+
 export const metadata = {
-  title: 'Bazar da Nat — peças selecionadas',
+  title: `${STORE_NAME} — peças selecionadas`,
   description: 'Catálogo de roupas femininas em ótimo estado. Reserve pelo site, pague por Pix.',
 };
 
