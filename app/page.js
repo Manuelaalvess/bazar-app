@@ -38,6 +38,7 @@ export default function CatalogPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
   const [loadError, setLoadError] = useState('');
+  const [zoomedImage, setZoomedImage] = useState(null);
 
   useEffect(() => {
     fetchItems();
@@ -132,7 +133,6 @@ export default function CatalogPage() {
     <>
       <header className="site-header wrap">
         <div className="brand">{STORE_NAME.toLowerCase()}</div>
-        <a className="admin-link" href="/admin">área da loja</a>
       </header>
 
       <div className="wrap">
@@ -174,7 +174,11 @@ export default function CatalogPage() {
               const available = item.status === 'available';
               return (
                 <article className="item-card" key={item.id}>
-                  <div className="item-photo">
+                  <div
+                    className="item-photo"
+                    onClick={item.imageUrl ? () => setZoomedImage(item.imageUrl) : undefined}
+                    style={item.imageUrl ? { cursor: 'zoom-in' } : undefined}
+                  >
                     {item.status !== 'available' && (
                       <span className={`status-pill ${item.status}`}>
                         {item.status === 'reserved' ? 'reservado' : 'vendido'}
@@ -298,6 +302,13 @@ export default function CatalogPage() {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {zoomedImage && (
+        <div className="overlay lightbox-overlay" onClick={() => setZoomedImage(null)}>
+          <button className="lightbox-close" onClick={() => setZoomedImage(null)}>×</button>
+          <img className="lightbox-img" src={zoomedImage} alt="Foto ampliada" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
 

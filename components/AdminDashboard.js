@@ -174,7 +174,10 @@ export default function AdminDashboard() {
     <div className="wrap admin-shell">
       <div className="admin-header">
         <h1>Área da loja</h1>
-        <button className="mini-btn" onClick={handleLogout}>sair</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a className="mini-btn" href="/">voltar ao catálogo</a>
+          <button className="mini-btn" onClick={handleLogout}>sair</button>
+        </div>
       </div>
 
       <div className="admin-tabs">
