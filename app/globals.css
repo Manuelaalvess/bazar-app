@@ -252,6 +252,7 @@ footer.site-footer p { color: var(--ink-soft); font-size: 14px; }
   .hero h1 { font-size: 32px; }
   .how-grid { grid-template-columns: 1fr; }
   .drawer { max-width: 100%; }
+  .admin-form { grid-template-columns: 1fr; }
 }
 
 /* ---------- Admin ---------- */
@@ -263,7 +264,7 @@ footer.site-footer p { color: var(--ink-soft); font-size: 14px; }
   background: var(--surface); font-size: 13.5px; color: var(--ink-soft);
 }
 .admin-tab.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th { text-align: left; font-weight: 500; color: var(--ink-soft); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
 td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
