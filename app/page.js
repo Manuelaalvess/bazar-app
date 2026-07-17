@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 // funciona, só não gera o link pronto do WhatsApp.
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '';
 const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || 'Bazar da Nat';
+const CONTACT_MESSAGE = 'Olá! Tenho uma dúvida sobre uma peça ou a entrega.';
 const CATEGORIES = [
   { key: 'all', label: 'todas' },
   { key: 'vestido', label: 'vestidos' },
@@ -238,6 +239,20 @@ export default function CatalogPage() {
         <button className="cart-fab" onClick={() => setCartOpen(true)}>
           ver seleção <span className="cart-badge">{cart.length}</span>
         </button>
+      )}
+
+      {WHATSAPP_NUMBER && (
+        <a
+          className="whatsapp-fab"
+          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(CONTACT_MESSAGE)}`}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Falar no WhatsApp"
+        >
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.9C21.96 6.45 17.5 2 12.04 2zm5.8 14.15c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.8-.11-.42-.13-.96-.31-1.65-.61-2.9-1.25-4.8-4.16-4.94-4.35-.14-.19-1.18-1.57-1.18-3 0-1.43.75-2.13 1.02-2.42.27-.29.58-.37.78-.37.19 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.1.19-.15.31-.29.48-.14.17-.3.37-.43.5-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.3 2.33 1.44.29.14.46.12.63-.07.17-.19.72-.84.91-1.13.19-.29.38-.24.65-.14.27.1 1.71.81 2 .96.29.14.48.22.55.34.07.12.07.7-.17 1.38z"/>
+          </svg>
+        </a>
       )}
 
       {cartOpen && (
