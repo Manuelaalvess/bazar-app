@@ -71,6 +71,18 @@ export default function AdminDashboard() {
     loadAll();
   }
 
+  async function removeOrderItem(orderId, itemId) {
+    if (!confirm('Remover esta peça do pedido? Ela volta a ficar disponível no catálogo.')) return;
+    const res = await fetch(`/api/orders/${orderId}/items/${itemId}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setActionError(data.error || 'Não foi possível remover a peça do pedido.');
+      return;
+    }
+    setActionError('');
+    loadAll();
+  }
+
   function startEdit(item) {
     setEditingId(item.id);
     setForm({
@@ -213,7 +225,18 @@ export default function AdminDashboard() {
                   </td>
                   <td>
                     {order.items.map((it) => (
-                      <div key={it.id} style={{ fontSize: 13 }}>{it.name} · tam. {it.size}</div>
+                      <div key={it.id} style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>{it.name} · tam. {it.size}</span>
+                        {(order.status === 'pending' || order.status === 'confirmed') && (
+                          <button
+                            onClick={() => removeOrderItem(order.id, it.itemId)}
+                            title="Remover peça deste pedido"
+                            style={{ background: 'none', border: 'none', color: 'var(--danger)', fontSize: 11, cursor: 'pointer', padding: 0 }}
+                          >
+                            remover
+                          </button>
+                        )}
+                      </div>
                     ))}
                   </td>
                   <td className="mono">{formatBRL(order.total)}</td>
