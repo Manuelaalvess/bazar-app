@@ -6,8 +6,8 @@ const letter = STORE_NAME.trim().split(' ').pop()?.[0]?.toUpperCase() || 'B';
 
 export default function Icon() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-    <rect width="32" height="32" rx="6" fill="#454F3B" />
-    <text x="16" y="22" font-family="Georgia, serif" font-size="18" font-weight="600" fill="#F7F3EB" text-anchor="middle">${letter}</text>
+    <rect width="32" height="32" rx="6" fill="#F6E9E4" />
+    <text x="16" y="22" font-family="Georgia, serif" font-size="18" font-weight="600" fill="#5C2F42" text-anchor="middle">${letter}</text>
   </svg>`;
   return new Response(svg, {
     headers: { 'Content-Type': 'image/svg+xml' },
