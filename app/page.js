@@ -41,6 +41,7 @@ export default function CatalogPage() {
   const [success, setSuccess] = useState(null);
   const [loadError, setLoadError] = useState('');
   const [zoomedImage, setZoomedImage] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchItems();
@@ -135,7 +136,33 @@ export default function CatalogPage() {
     <>
       <header className="site-header wrap">
         <div className="brand">{STORE_NAME.toLowerCase()}</div>
+        <button className="menu-btn" onClick={() => setMenuOpen(true)} aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
       </header>
+
+      {menuOpen && (
+        <div className="overlay menu-overlay" onClick={() => setMenuOpen(false)}>
+          <div className="menu-dropdown" onClick={(e) => e.stopPropagation()}>
+            <a href="#como-funciona" onClick={() => setMenuOpen(false)}>como funciona</a>
+            {WHATSAPP_NUMBER && (
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(CONTACT_MESSAGE)}`}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setMenuOpen(false)}
+              >
+                contato
+              </a>
+            )}
+            {STORE_LOCATION && <span className="menu-location">{STORE_LOCATION}</span>}
+          </div>
+        </div>
+      )}
 
       <div className="wrap">
         <section className="hero">
@@ -214,7 +241,7 @@ export default function CatalogPage() {
           </div>
         )}
 
-        <section className="how">
+        <section className="how" id="como-funciona">
           <h2>Como funciona</h2>
           <div className="how-grid">
             <div className="how-step">

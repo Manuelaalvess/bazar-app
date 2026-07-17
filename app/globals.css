@@ -48,6 +48,24 @@ button {
   font-size: 21px;
   letter-spacing: 0.3px;
 }
+.menu-btn {
+  background: none; border: none; color: var(--ink);
+  display: flex; align-items: center; justify-content: center; padding: 4px;
+}
+.menu-overlay { background: transparent; justify-content: flex-end; align-items: flex-start; }
+.menu-dropdown {
+  margin-top: 78px; margin-right: 28px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 12px; padding: 8px; display: flex; flex-direction: column; min-width: 180px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+}
+.menu-dropdown a {
+  padding: 10px 12px; font-size: 14px; border-radius: 8px; text-decoration: none; color: var(--ink);
+}
+.menu-dropdown a:hover { background: var(--bg); color: var(--ink); }
+.menu-dropdown .menu-location {
+  padding: 10px 12px 4px; font-size: 12.5px; color: var(--ink-soft);
+  border-top: 1px solid var(--line); margin-top: 4px;
+}
 
 /* ---------- Hero ---------- */
 .hero { padding: 64px 0 48px; }
