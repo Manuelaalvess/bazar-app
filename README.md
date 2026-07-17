@@ -132,3 +132,4 @@ funcionalidades novas (ex: upload de foto em vez de URL), a mudança fica
 isolada em `lib/db.js` — o resto da aplicação não precisa saber como o banco
 funciona por dentro.
 
+
