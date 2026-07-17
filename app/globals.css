@@ -126,6 +126,8 @@ button {
 }
 .item-photo {
   aspect-ratio: 3/4;
+  min-height: 0;
+  overflow: hidden;
   background: #ECE6D9;
   display: flex;
   align-items: center;
