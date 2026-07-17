@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 // funciona, só não gera o link pronto do WhatsApp.
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '';
 const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME || 'Bazar da Nat';
+const STORE_LOCATION = process.env.NEXT_PUBLIC_STORE_LOCATION || '';
 const CONTACT_MESSAGE = 'Olá! Tenho uma dúvida sobre uma peça ou a entrega.';
 const CATEGORIES = [
   { key: 'all', label: 'todas' },
@@ -328,7 +329,9 @@ export default function CatalogPage() {
       )}
 
       <footer className="site-footer">
-        <p>{STORE_NAME} · reservas via site, pagamento por Pix, combinado direto no WhatsApp.</p>
+        <p>
+          {STORE_NAME}{STORE_LOCATION ? ` · ${STORE_LOCATION}` : ''} · reservas via site, pagamento por Pix, combinado direto no WhatsApp.
+        </p>
       </footer>
     </>
   );

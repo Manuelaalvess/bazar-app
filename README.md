@@ -32,6 +32,7 @@ deploys, reinícios e múltiplas instâncias do servidor rodando ao mesmo tempo.
 | `ADMIN_PASSWORD` | sim | senha do painel admin — sem ela, o app recusa qualquer login (não existe senha padrão) |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | não | número da loja (DDI 55 + DDD, só números) para o link do WhatsApp após a reserva |
 | `NEXT_PUBLIC_STORE_NAME` | não | nome exibido no título, cabeçalho e rodapé (padrão: "Bazar da Nat") — permite reaproveitar o mesmo código pra deploys com nomes diferentes |
+| `NEXT_PUBLIC_STORE_LOCATION` | não | cidade/estado exibido no rodapé (ex.: "Nova Friburgo - RJ") — sem ela, o rodapé não mostra localização |
 
 ## Como rodar no seu computador
 
