@@ -33,6 +33,7 @@ deploys, reinícios e múltiplas instâncias do servidor rodando ao mesmo tempo.
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | não | número da loja (DDI 55 + DDD, só números) para o link do WhatsApp após a reserva |
 | `NEXT_PUBLIC_STORE_NAME` | não | nome exibido no título, cabeçalho e rodapé (padrão: "Bazar da Nat") — permite reaproveitar o mesmo código pra deploys com nomes diferentes |
 | `NEXT_PUBLIC_STORE_LOCATION` | não | cidade/estado exibido no rodapé (ex.: "Nova Friburgo - RJ") — sem ela, o rodapé não mostra localização |
+| `NEXT_PUBLIC_SITE_URL` | não | URL canônica do site (ex.: "https://bazar-da-manu.vercel.app") — usada na metadata Open Graph/Twitter para pré-visualização de links compartilhados |
 
 ## Como rodar no seu computador
 
