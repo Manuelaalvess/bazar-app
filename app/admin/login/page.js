@@ -20,7 +20,18 @@ export default function AdminLoginPage() {
     });
     setLoading(false);
     if (!res.ok) {
-      setError('Senha incorreta.');
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        setError('Senha incorreta.');
+      } else if (res.status === 429) {
+        setError('Muitas tentativas. Aguarde alguns minutos.');
+      } else if (res.status === 400) {
+        setError('Requisição inválida.');
+      } else if (res.status === 500) {
+        setError('Serviço temporariamente indisponível. Tente mais tarde.');
+      } else {
+        setError(data.error || 'Não foi possível entrar. Tente novamente.');
+      }
       return;
     }
     router.push('/admin');
