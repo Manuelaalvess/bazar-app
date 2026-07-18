@@ -34,6 +34,7 @@ deploys, reinícios e múltiplas instâncias do servidor rodando ao mesmo tempo.
 | `NEXT_PUBLIC_STORE_NAME` | não | nome exibido no título, cabeçalho e rodapé (padrão: "Bazar da Nat") — permite reaproveitar o mesmo código pra deploys com nomes diferentes |
 | `NEXT_PUBLIC_STORE_LOCATION` | não | cidade/estado exibido no rodapé (ex.: "Nova Friburgo - RJ") — sem ela, o rodapé não mostra localização |
 | `NEXT_PUBLIC_SITE_URL` | não | URL canônica do site (ex.: "https://bazar-da-manu.vercel.app") — usada na metadata Open Graph/Twitter para pré-visualização de links compartilhados |
+| `BLOB_READ_WRITE_TOKEN` | sim, pro upload de foto | token do Vercel Blob — gerado automaticamente ao conectar um Blob Store ao projeto na Vercel; sem ele, o upload de foto (mas não o cadastro por link) fica indisponível |
 
 ## Como rodar no seu computador
 
@@ -83,10 +84,22 @@ O login também tem limite de 10 tentativas por IP a cada 15 minutos.
   segunda recebe erro na hora — a trava do banco impede que as duas reservas
   aconteçam juntas, mesmo em alta concorrência.
 - **WhatsApp**: depois de reservar, abre automaticamente uma conversa com a
-  mensagem já escrita (peças, tamanhos e valor total).
+  mensagem já escrita (peças, tamanhos e valor total). Também tem um botão
+  flutuante fixo pra cliente falar com a loja sem precisar reservar nada
+  antes (dúvidas sobre entrega, tamanho etc.).
+- **Menu do cabeçalho**: ícone de três linhas com atalhos pra "como funciona",
+  contato via WhatsApp e a localização da loja.
+- **Zoom na foto**: clicar numa peça do catálogo amplia a imagem numa
+  janela por cima da página.
+- **Favicon dinâmico**: o ícone da aba do navegador usa a primeira letra do
+  nome da loja, gerado automaticamente a partir de `NEXT_PUBLIC_STORE_NAME`.
 - **Painel admin (`/admin`)**:
-  - aba **pedidos** — confirmar, marcar como entregue ou cancelar (cancelar libera a peça de volta pro catálogo)
-  - aba **peças** — cadastrar, editar, excluir e marcar peças como vendidas, sem mexer em código
+  - aba **pedidos** — confirmar, marcar como entregue ou cancelar (cancelar
+    libera as peças de volta pro catálogo); dá pra remover só uma peça
+    específica de um pedido com várias, sem cancelar o resto
+  - aba **peças** — cadastrar, editar, excluir e marcar peças como vendidas,
+    sem mexer em código; a foto pode ser um link ou um upload direto da
+    galeria/câmera do celular (via Vercel Blob)
 
 ## Antes de usar de verdade
 
@@ -104,7 +117,11 @@ O login também tem limite de 10 tentativas por IP a cada 15 minutos.
    - `DATABASE_URL` — a connection string do Neon/Supabase (com `?sslmode=require`)
    - `ADMIN_PASSWORD` — sua senha do painel
    - `NEXT_PUBLIC_WHATSAPP_NUMBER` — número da loja para o link do WhatsApp
-4. Deploy. Pronto — o banco na nuvem já está acessível de qualquer lugar, e o
+   - `NEXT_PUBLIC_STORE_NAME`, `NEXT_PUBLIC_STORE_LOCATION`, `NEXT_PUBLIC_SITE_URL` — opcionais, ver tabela acima
+4. Em **Storage**, crie um **Blob Store** e conecte ao projeto — isso gera a
+   variável `BLOB_READ_WRITE_TOKEN` automaticamente, sem precisar colar nada
+   na mão. É o que permite o upload de foto direto da galeria no painel admin.
+5. Deploy. Pronto — o banco na nuvem já está acessível de qualquer lugar, e o
    site funciona igual em produção e em desenvolvimento.
 
 Se preferir manter tudo dentro do ecossistema Vercel, existe também o
@@ -114,24 +131,31 @@ mesmo jeito, só muda de onde vem a `DATABASE_URL`.
 ## Estrutura do projeto
 
 ```
-app/                    páginas e rotas de API (Next.js App Router)
-  page.js               catálogo público + carrinho
-  admin/                painel administrativo (protegido por senha)
-  api/                   endpoints: items, orders, admin/login, admin/logout
+app/                              páginas e rotas de API (Next.js App Router)
+  page.js                         catálogo público, carrinho, menu, zoom na foto
+  layout.js                       metadata (título, Open Graph, Twitter) e fontes
+  icon.js                         favicon dinâmico (SVG com a inicial da loja)
+  robots.js                       robots.txt (bloqueia /admin e /api/)
+  admin/                          painel administrativo (protegido por senha)
+  api/
+    admin/login, admin/logout     autenticação do painel
+    admin/upload/                 gera token de upload de foto pro Vercel Blob
+    items/, items/[id]/           CRUD de peças
+    orders/, orders/[id]/         pedidos e mudança de status
+    orders/[id]/items/[itemId]/   remoção de uma peça específica de um pedido
 components/
-  AdminDashboard.js      lógica do painel (pedidos e gestão de peças)
+  AdminDashboard.js               lógica do painel (pedidos e gestão de peças)
 lib/
-  db.js                  toda a lógica de acesso ao banco (única camada que fala com o Postgres)
-  auth.js                geração/verificação do cookie de sessão do admin (isAdminRequest)
-  validation.js          validação de URL de imagem
-  schema.sql             schema de referência (o db.js já cria as tabelas e constraints sozinho)
+  db.js                           toda a lógica de acesso ao banco (única camada que fala com o Postgres)
+  auth.js                         geração/verificação do cookie de sessão do admin (isAdminRequest)
+  validation.js                   validação de URL de imagem
+  schema.sql                      schema de referência (o db.js já cria as tabelas e constraints sozinho)
 scripts/
-  seed.js                popula o catálogo com peças de exemplo
+  seed.js                         popula o catálogo com peças de exemplo
 ```
 
-Se um dia quiser trocar de Postgres para outro banco, ou adicionar
-funcionalidades novas (ex: upload de foto em vez de URL), a mudança fica
-isolada em `lib/db.js` — o resto da aplicação não precisa saber como o banco
-funciona por dentro.
+Se um dia quiser trocar de Postgres para outro banco, a mudança fica isolada
+em `lib/db.js` — o resto da aplicação não precisa saber como o banco funciona
+por dentro.
 
 
