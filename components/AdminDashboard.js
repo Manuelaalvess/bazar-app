@@ -38,16 +38,29 @@ export default function AdminDashboard() {
 
   async function loadAll() {
     setLoading(true);
-    const [ordersRes, itemsRes] = await Promise.all([fetch('/api/orders'), fetch('/api/items')]);
-    if (ordersRes.status === 401) {
-      router.push('/admin/login');
-      return;
+    setActionError('');
+    try {
+      const [ordersRes, itemsRes] = await Promise.all([
+        fetch('/api/orders'),
+        fetch('/api/items'),
+      ]);
+      if (ordersRes.status === 401 || itemsRes.status === 401) {
+        router.push('/admin/login');
+        return;
+      }
+      if (!ordersRes.ok || !itemsRes.ok) {
+        setActionError('Não foi possível carregar os dados. Tente recarregar a página.');
+        return;
+      }
+      const ordersData = await ordersRes.json();
+      const itemsData = await itemsRes.json();
+      setOrders(ordersData.orders || []);
+      setItems(itemsData.items || []);
+    } catch {
+      setActionError('Erro de conexão. Verifique sua internet e tente novamente.');
+    } finally {
+      setLoading(false);
     }
-    const ordersData = await ordersRes.json();
-    const itemsData = await itemsRes.json();
-    setOrders(ordersData.orders || []);
-    setItems(itemsData.items || []);
-    setLoading(false);
   }
 
   async function handleLogout() {
