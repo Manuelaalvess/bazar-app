@@ -54,7 +54,13 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Muitas tentativas. Aguarde alguns minutos.' }, { status: 429 });
   }
 
-  const { password } = await request.json();
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Requisição inválida' }, { status: 400 });
+  }
+  const { password } = body ?? {};
   const valid = typeof password === 'string' && password.length > 0 && timingSafeCompare(password, adminPassword);
 
   if (!valid) {
