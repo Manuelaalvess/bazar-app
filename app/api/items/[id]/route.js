@@ -28,6 +28,10 @@ export async function DELETE(request, { params }) {
   if (!isAdminRequest()) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
-  await deleteItem(params.id);
-  return NextResponse.json({ ok: true });
+  try {
+    await deleteItem(params.id);
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 409 });
+  }
 }
