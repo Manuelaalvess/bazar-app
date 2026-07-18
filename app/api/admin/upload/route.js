@@ -25,6 +25,10 @@ export async function POST(request) {
     });
     return NextResponse.json(jsonResponse);
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+    console.error('Erro no upload:', err);
+    return NextResponse.json(
+      { error: 'Não foi possível enviar a foto. Tente novamente.' },
+      { status: 400 }
+    );
   }
 }
